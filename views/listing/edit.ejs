@@ -1,0 +1,17 @@
+
+
+<body>
+    <h3><i> Edit your List </i> </h3>
+    <form method="Post" action="/listing/<%=list._id%>/?_method=PUT">
+        <input type="text" name="listing[title]" value="<%=list.title%>"> <br>
+        <textarea type="text" name="listing[description]" placeholder="enter the description" id=""></textarea> <br>
+        <input type="text" name="listing[image]" value="<%= list.image%>"> <br>
+        <input type="text" name="listing[price]" value="<%=list.price%>"> <br>
+        <input type="text" name="lsiting[country]" value="<%=list.country%>"> <br> 
+        <input type="text" name="listing[location]" value="<%=list.location%>"> <br>
+
+        <button>Edit</button>
+        
+    </form>
+    
+</body>
