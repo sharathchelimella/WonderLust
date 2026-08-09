@@ -1,22 +1,27 @@
 const mongoose = require("mongoose");
 
+const defaultUrl = "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=60";
 
-const listingSchema = mongoose.Schema({
-    title:{
-        type:String,
-        required : true
+const listingSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
     },
     description: String,
     image: {
-        type:String,
-        default:"https://www.magnific.com/free-photo/sunset-time-tropical-beach-sea-with-coconut-palm-tree_3531881.htm#fromView=keyword&page=1&position=0&uuid=8ebfe6ca-4f6c-4951-987b-b85a3f64475f&query=Sunset",
-        set:(v)=>v=== ""?v:"https://www.magnific.com/free-photo/sunset-time-tropical-beach-sea-with-coconut-palm-tree_3531881.htm#fromView=keyword&page=1&position=0&uuid=8ebfe6ca-4f6c-4951-987b-b85a3f64475f&query=Sunset",
+        filename: {
+            type: String,
+            default: "listingimage",
+        },
+        url: {
+            type: String,
+            default: defaultUrl,
+            set: (v) => (v === "" || !v ? defaultUrl : v),
+        },
     },
-    price:Number,
+    price: Number,
     location: String,
     country: String,
 });
 
-const Listing = mongoose.model("Listing",listingSchema);
-
-module.exports = {Listing};
+module.exports = mongoose.model("Listing", listingSchema);
