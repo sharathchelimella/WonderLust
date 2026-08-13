@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Review = require("./review.js");
 
 const defaultUrl = "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=60";
 
@@ -22,6 +23,18 @@ const listingSchema = new mongoose.Schema({
     price: Number,
     location: String,
     country: String,
+    reviews: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Review",
+        },
+    ],
 });
 
-module.exports = mongoose.model("Listing", listingSchema);
+listingSchema.post("findOneAndDelete", async (listing) => {
+    if (listing && listing.reviews && listing.reviews.length) {
+        await Review.deleteMany({ _id: { $in: listing.reviews } });
+    }
+});
+
+module.exports = mongoose.model("Listing", listingSchema);
