@@ -5,13 +5,34 @@ const mongoose = require("mongoose");
 const path = require("path");
 const Listing = require("./models/listing.js");
 const Review = require("./models/review.js");
-const methodOverride = require("method-override");
 const ejsmate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
-const ExpressError = require("./utils/ExpressErrors");
+const ExpressError = require("./utils/ExpressErrors.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
-const listings = require("./routes/listing.js");
-const reviews = require("./routes/review.js");
+const User = require("./models/user.js")
+const userrouter = require("./routes/user.js")
+const listingsrouter = require("./routes/listing.js");
+const reviewsrouter = require("./routes/review.js");
+
+
+const session = require("express-session");
+const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy  = require("passport-local");
+const methodOverride = require("method-override");
+
+
+
+const sessionOptions = {
+    secret:"mySuperKey",
+    resave : false,
+    saveUninitialized:true,
+    cookie:{
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 3,
+        maxAge:1000*60*60*24*3,
+        httpOnly:true
+    }
+};
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -20,6 +41,32 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsmate);
 
+app.use(session(sessionOptions));
+app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate));
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser());
+
+
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
+
+// app.get("/demouser",async (req,res,next)=>{
+//     let fakerUser = new User({
+//         email:"sunny@gmail.com",
+//         username: "Sunny",
+//     });
+//     let registerd = await User.register(fakerUser,"helloworld");
+//     res.send(registerd);
+// });
+ 
 async function main() {
     await mongoose.connect("mongodb://127.0.0.1:27017/wonderlust");
 }
@@ -32,8 +79,9 @@ main()
         console.log(err);
     });
 
-app.use("/listings", listings);
-app.use("/listings/:id/reviews", reviews);
+app.use("/listings", listingsrouter);
+app.use("/listings/:id/reviews", reviewsrouter);
+app.use("/",userrouter);
 
 app.get("/", (req, res) => {
     res.redirect("/listings");
@@ -44,8 +92,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-    let { status = 500, message = "Something went wrong!" } = err;
-    res.status(status).render("error.ejs", { message });
+    let { status, statusCode, message = "Something went wrong!" } = err;
+    let errStatus = status || statusCode || 500;
+    res.status(errStatus).render("error.ejs", { message });
 });
 
 app.listen(port, () => {

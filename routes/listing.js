@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const { listingSchema, reviewSchema } = require("../schema.js");
-const ExpressError = require("../utils/ExpressErrors");
+const ExpressError = require("../utils/ExpressErrors.js");
 const Listing = require("../models/listing.js");
 
 const validateListing = (req, res, next) => {
@@ -45,6 +45,7 @@ router.post("/", validateListing, wrapAsync(async (req, res, next) => {
     }
     const newlist = new Listing(listingData);
     await newlist.save();
+    req.flash("success", "New listing created successfully!");
     res.redirect("/listings");
 }));
 
@@ -53,8 +54,10 @@ router.get("/:id/edit", wrapAsync(async (req, res) => {
     let { id } = req.params;
     let listing = await Listing.findById(id);
     if (!listing) {
-        throw new ExpressError(404, "Listing not found");
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
     }
+   
     res.render("listing/edit.ejs", {
         list: listing,
     });
@@ -81,8 +84,10 @@ router.put("/:id", validateListing, wrapAsync(async (req, res, next) => {
     }
     let updatedListing = await Listing.findByIdAndUpdate(id, { ...listingData }, { runValidators: true, new: true });
     if (!updatedListing) {
-        throw new ExpressError(404, "Listing not found");
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
     }
+    req.flash("success", "Listing updated successfully!");
     res.redirect(`/listings/${id}`);
 }));
 
@@ -91,8 +96,10 @@ router.delete("/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     let deletedListing = await Listing.findByIdAndDelete(id);
     if (!deletedListing) {
-        throw new ExpressError(404, "Listing not found");
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
     }
+    req.flash("success", "Listing deleted successfully!");
     res.redirect("/listings");
 }));
 
@@ -101,7 +108,8 @@ router.get("/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id).populate("reviews");
     if (!listing) {
-        throw new ExpressError(404, "Listing not found");
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings");
     }
     res.render("listing/show.ejs", {
         listing,
