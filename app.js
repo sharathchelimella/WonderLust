@@ -14,7 +14,6 @@ const userrouter = require("./routes/user.js")
 const listingsrouter = require("./routes/listing.js");
 const reviewsrouter = require("./routes/review.js");
 
-
 const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
@@ -46,7 +45,7 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate));
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser());
 
@@ -55,6 +54,8 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
+    res.locals.curentuser = req.user;
+    res.locals.currUser = req.user;
     next();
 });
 
@@ -92,9 +93,10 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-    let { status, statusCode, message = "Something went wrong!" } = err;
-    let errStatus = status || statusCode || 500;
-    res.status(errStatus).render("error.ejs", { message });
+    let { status, statusCode, message } = err;
+    let errStatus = typeof status === "number" ? status : (typeof statusCode === "number" ? statusCode : 500);
+    let errMessage = message || "Something went wrong!";
+    res.status(errStatus).render("error.ejs", { message: errMessage });
 });
 
 app.listen(port, () => {
