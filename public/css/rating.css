@@ -1,0 +1,101 @@
+/* Starability Rating System - Form Input & Result Display */
+
+/* 1. Starability Form Input Fieldset */
+.starability-slot {
+  display: block;
+  position: relative;
+  min-height: 30px;
+  border: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+
+.starability-slot > legend {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.starability-slot > input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Star labels default to filled gold star */
+.starability-slot > label {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  font-size: 0;
+  color: transparent;
+  cursor: pointer;
+  margin-right: 4px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f59e0b'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 24px 24px;
+  transition: transform 0.15s ease;
+}
+
+.starability-slot > label:hover {
+  transform: scale(1.2);
+}
+
+/* Hide no-rate input label */
+.starability-slot > .input-no-rate,
+.starability-slot > label[for="no-rate"] {
+  display: none;
+}
+
+/* If no-rate input is checked, all star labels become empty gray stars */
+.starability-slot > input.input-no-rate:checked ~ label {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e5e7eb'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+}
+
+/* For checked star input: target all sibling labels after the checked label and make them empty stars */
+.starability-slot > input:checked + label ~ label {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e5e7eb'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+}
+
+/* Hover effects: when fieldset is hovered, set all labels to gold stars, then set labels after hovered one to empty gray stars */
+.starability-slot:hover > label {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f59e0b'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+}
+
+.starability-slot > label:hover ~ label {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e5e7eb'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+}
+
+/* 2. Starability Result Display (on review cards) */
+.starability-result {
+  position: relative;
+  display: inline-block;
+  width: 120px; /* 5 stars * 24px */
+  height: 24px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0;
+  color: transparent;
+  margin-bottom: 0.5rem;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e5e7eb'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 24px 24px;
+}
+
+.starability-result::before {
+  content: "";
+  display: block;
+  height: 100%;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f59e0b'%3E%3Cpath d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 24px 24px;
+}
+
+.starability-result[data-rating="0"]::before { width: 0%; }
+.starability-result[data-rating="1"]::before { width: 20%; }
+.starability-result[data-rating="2"]::before { width: 40%; }
+.starability-result[data-rating="3"]::before { width: 60%; }
+.starability-result[data-rating="4"]::before { width: 80%; }
+.starability-result[data-rating="5"]::before { width: 100%; }

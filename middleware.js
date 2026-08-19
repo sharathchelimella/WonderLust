@@ -3,15 +3,16 @@ const Review = require("./models/review.js");
 const ExpressError = require("./utils/ExpressErrors.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
 
-module.exports.isLoggedIn = (req,res,next)=>{
-    console.log(req.path,"..",req.originalUrl);
-    if(!req.isAuthenticated()){
-        req.session.redirectUrl = req.originalUrl;
-        req.flash("error","You have to login before adding the lisssting");
+module.exports.isLoggedIn = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        if (req.method === "GET") {
+            req.session.redirectUrl = req.originalUrl;
+        }
+        req.flash("error", "You must be logged in!");
         return res.redirect("/login");
     }
     next();
-} 
+};
 
 module.exports.saveRedirectUrl = (req,res,next)=>{
     if(req.session.redirectUrl){

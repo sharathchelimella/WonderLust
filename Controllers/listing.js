@@ -34,12 +34,16 @@ module.exports.showlisting = async (req, res) => {
 module.exports.createlisting = async (req, res, next) => {
     let listingData = req.body.listing || {};
 
-    if (typeof listingData.image === "string") {
+    if (req.file) {
+        let url = req.file.path || `/uploads/${req.file.filename}`;
+        let filename = req.file.filename;
+        listingData.image = { url, filename };
+    } else if (typeof listingData.image === "string") {
         let url = listingData.image.trim();
         listingData.image = url ? { filename: "listingimage", url } : undefined;
     } else if (listingData.image && typeof listingData.image.url === "string") {
         let url = listingData.image.url.trim();
-        if (url) {
+        if (url) { 
             listingData.image = { filename: listingData.image.filename || "listingimage", url };
         } else {
             delete listingData.image;
@@ -70,7 +74,11 @@ module.exports.redereditform = async (req, res) => {
 module.exports.updatelisting = async (req, res, next) => {
     const { id } = req.params;
     let listingData = req.body.listing || {};
-    if (typeof listingData.image === "string") {
+    if (req.file) {
+        let url = req.file.path || `/uploads/${req.file.filename}`;
+        let filename = req.file.filename;
+        listingData.image = { url, filename };
+    } else if (typeof listingData.image === "string") {
         let url = listingData.image.trim();
         if (url) {
             listingData.image = { filename: "listingimage", url };

@@ -13,8 +13,6 @@ router
 
 
 router
-
-router
 .route("/login")
 .get( userController.rederlogin)
 .post( saveRedirectUrl, passport.authenticate("local", {
